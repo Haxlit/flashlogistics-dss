@@ -7,7 +7,7 @@
 ## 👥 Equipo (Squad)
 
 | Integrante | 
-|---|---|
+|---|
 | Josue Adhemar Mamani Huanacu | 
 | Josue Matias Arroyo Reynoso | 
 | Luis Fernando Arias Segovia | 
