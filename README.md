@@ -6,11 +6,11 @@
 
 ## 👥 Equipo (Squad)
 
-| Integrante | Rol |
+| Integrante | 
 |---|---|
-| Josue Adhemar Mamani Huanacu | Product Owner / Analista |
-| Josue Matias Arroyo Reynoso | Desarrollador Backend |
-| Luis Fernando Arias Segovia | Desarrollador Frontend |
+| Josue Adhemar Mamani Huanacu | 
+| Josue Matias Arroyo Reynoso | 
+| Luis Fernando Arias Segovia | 
 
 ---
 
