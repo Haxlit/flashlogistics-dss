@@ -271,3 +271,43 @@ Panel gerencial con KPIs: eficiencia por conductor, rutas críticas, tasa de cum
 
 ---
 
+# Product Backlog — FlashLogistics DSS (Historias de Usuario
+
+### Actividad Práctica 3: Product Backlog Building (PBB) · Sistemas de Información II · UPDS
+
+Este repositorio contiene el Product Backlog estructurado para **FlashLogistics DSS**, organizado por Épicas, Historias de Usuario, Criterios de Aceptación y Prioridades para facilitar su gestión visual y desarrollo ágil en GitHub Issues.
+
+---
+
+
+| ID | Épica Relacionada | Historia de Usuario (Rol + Acción + Valor) | Criterios de Aceptación (Mínimo 2) | Prioridad |
+| :---: | :--- | :--- | :--- | :---: |
+| **HU01** | 🟦 `Epic: Data` | Como **despachadora**, quiero importar pedidos diarios vía archivo CSV, para evitar la carga manual en Excel y reducir errores de digitación. | <ul><li>[ ] El sistema valida el formato CSV y rechaza archivos con columnas incorrectas mostrando el error específico.</li><li>[ ] Se muestra un log con el total de registros importados, exitosos y fallidos.</li></ul> | 🔴 **Alta** |
+| **HU02** | 🟦 `Epic: Data` | Como **despachadora**, quiero registrar manualmente un nuevo pedido con datos de cliente, dirección y producto, para cubrir pedidos de última hora no incluidos en el CSV. | <ul><li>[ ] El formulario valida campos obligatorios (cliente, dirección, producto, cantidad) y no permite guardar si están vacíos.</li><li>[ ] El pedido registrado aparece inmediatamente en la lista de pendientes del día.</li></ul> | 🔴 **Alta** |
+| **HU03** | 🟦 `Epic: Data` | Como **gerente de operaciones**, quiero consultar el historial de pedidos por fecha y estado (entregado/fallido/pendiente), para tener trazabilidad de las operaciones pasadas. | <ul><li>[ ] El sistema permite filtrar por rango de fechas y por estado de entrega.</li><li>[ ] Los resultados se paginan en grupos de 20 registros y muestran el total encontrado.</li></ul> | 🟡 **Media** |
+| **HU04** | 🟪 `Epic: Routing` | Como **gerente de operaciones**, quiero que el sistema calcule automáticamente la ruta óptima para cada camión al inicio del día, para eliminar la planificación manual en pizarra y reducir las entregas tardías. | <ul><li>[ ] El algoritmo considera capacidad del camión, zona geográfica y prioridad de pedido para asignar rutas.</li><li>[ ] El resultado se presenta en un mapa digital con la secuencia de paradas antes de las 7:15 am.</li></ul> | 🔴 **Alta** |
+| **HU05** | 🟪 `Epic: Routing` | Como **gerente de operaciones**, quiero ver el costo estimado de combustible por ruta antes de aprobarla, para decidir si el despacho es rentable. | <ul><li>[ ] El cálculo de costo se muestra automáticamente en el dashboard de rutas antes de la aprobación.</li><li>[ ] El sistema genera una alerta visual si el costo estimado supera el presupuesto diario configurado.</li></ul> | 🔴 **Alta** |
+| **HU06** | 🟪 `Epic: Routing` | Como **despachadora**, quiero reconfigurar la ruta de un camión ante la cancelación de un pedido, para no enviar al conductor a una dirección innecesaria. | <ul><li>[ ] Al cancelar un pedido, el sistema recalcula la ruta del camión afectado y actualiza la secuencia de paradas.</li><li>[ ] El conductor recibe la ruta actualizada en su app en menos de 2 minutos tras la cancelación.</li></ul> | 🟡 **Media** |
+| **HU07** | 🔷 `Epic: GPS` | Como **gerente de operaciones**, quiero ver en un mapa en tiempo real la ubicación de cada camión de la flota, para tomar decisiones operativas inmediatas ante cualquier incidencia. | <ul><li>[ ] El mapa se actualiza con la posición de cada camión cada 30 segundos sin necesidad de recargar la página.</li><li>[ ] Cada camión se muestra con su código e ícono de estado (en ruta, detenido, con retraso).</li></ul> | 🔴 **Alta** |
+| **HU08** | 🔷 `Epic: GPS` | Como **gerente de operaciones**, quiero recibir alertas automáticas cuando un camión lleva más de 15 minutos de retraso sobre el ETA estimado, para tomar acciones correctivas antes de que el cliente se comunique. | <ul><li>[ ] La alerta se muestra en el dashboard y envía notificación push al gerente cuando el retraso supera los 15 minutos.</li><li>[ ] La alerta incluye nombre del conductor, pedido afectado y nueva hora estimada de llegada calculada por el sistema.</li></ul> | 🔴 **Alta** |
+| **HU09** | 🟩 `Epic: Portal` | Como **cliente minorista**, quiero consultar el estado de mi pedido en tiempo real desde un portal web sin necesidad de llamar al despachador, para planificar mi jornada con certeza. | <ul><li>[ ] El portal permite buscar un pedido por número de pedido o RUC del cliente sin necesidad de crear una cuenta.</li><li>[ ] Se muestra el estado actual (despachado / en ruta / entregado) y la hora estimada de llegada actualizada.</li></ul> | 🔴 **Alta** |
+| **HU10** | 🟩 `Epic: Portal` | Como **cliente minorista**, quiero recibir una notificación automática por SMS o email cuando mi pedido salga del almacén y cuando esté a 30 minutos de llegar, para no tener que consultar el portal manualmente. | <ul><li>[ ] El sistema envía un SMS/email al salir el camión con el número de pedido y rango horario estimado de entrega.</li><li>[ ] Se envía una segunda notificación cuando el camión está a 30 minutos o menos de la dirección de entrega.</li></ul> | 🔴 **Alta** |
+| **HU11** | 🟧 `Epic: Analytics` | Como **gerente de operaciones**, quiero ver un dashboard con los KPIs principales del día (% entregas a tiempo, consumo de combustible, eficiencia por conductor), para tomar decisiones basadas en datos sin construir reportes en Excel. | <ul><li>[ ] El dashboard muestra mínimo 5 KPIs en tiempo real: % entregas a tiempo, combustible consumido, pedidos entregados/fallidos, tiempo promedio por ruta y ranking de conductores.</li><li>[ ] Los gráficos se actualizan automáticamente al cierre de cada entrega sin necesidad de recargar la página.</li></ul> | 🔴 **Alta** |
+| **HU12** | 🟧 `Epic: Analytics` | Como **gerente de operaciones**, quiero exportar el reporte de desempeño semanal en formato PDF o Excel, para compartirlo con la dirección de la empresa en reuniones de gestión. | <ul><li>[ ] El reporte exportado incluye los mismos KPIs del dashboard para el rango de fechas seleccionado.</li><li>[ ] El archivo se genera y descarga en menos de 10 segundos para rangos de hasta 30 días de datos.</li></ul> | 🟡 **Media** |
+
+---
+
+## 🏷️ Guía de Configuración de Labels (Etiquetas) en GitHub
+
+Para mapear correctamente el Backlog con los tableros de GitHub, se recomienda configurar las siguientes etiquetas en la sección **Issues ➔ Labels ➔ New Label**:
+
+| Nombre de Etiqueta | Color Hexadecimal | Módulo / Épica |
+| :--- | :---: | :--- |
+| `Epic: Data` | `#2E75B6` | Gestión de Datos |
+| `Epic: Routing` | `#7030A0` | Motor de Cálculo |
+| `Epic: GPS` | `#0070C0` | Tracking GPS |
+| `Epic: Portal` | `#00B050` | Portal Cliente |
+| `Epic: Analytics` | `#C55A11` | Dashboard Analytics |
+
+---
+*Nota: Todas las Historias de Usuario listadas cumplen estrictamente con el filtro **INVEST** (Independiente, Negociable, Valorable, Estimable, Pequeña y Testeable).*
