@@ -310,4 +310,3 @@ Para mapear correctamente el Backlog con los tableros de GitHub, se recomienda c
 | `Epic: Analytics` | `#C55A11` | Dashboard Analytics |
 
 ---
-*Nota: Todas las Historias de Usuario listadas cumplen estrictamente con el filtro **INVEST** (Independiente, Negociable, Valorable, Estimable, Pequeña y Testeable).*
