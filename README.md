@@ -275,7 +275,7 @@ Panel gerencial con KPIs: eficiencia por conductor, rutas críticas, tasa de cum
 
 ### Actividad Práctica 3: Product Backlog Building (PBB) · Sistemas de Información II · UPDS
 
-Este repositorio contiene el Product Backlog estructurado para **FlashLogistics DSS**, organizado por Épicas, Historias de Usuario, Criterios de Aceptación y Prioridades para facilitar su gestión visual y desarrollo ágil en GitHub Issues.
+
 
 ---
 
