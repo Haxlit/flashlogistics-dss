@@ -1,0 +1,522 @@
+@startuml diagrama_clases_persistencia
+title Sistema de Despacho Logistico - Diagrama de Clases de Persistencia
+scale 0.55
+
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+skinparam classFontSize 8
+skinparam classBackgroundColor #EEF2FF
+skinparam classBorderColor #4F46E5
+skinparam classHeaderBackgroundColor #4F46E5
+skinparam classFontColor #FFFFFF
+skinparam attributeFontColor #1E1B4B
+skinparam attributeFontSize 7
+skinparam arrowColor #374151
+skinparam arrowThickness 1.2
+skinparam packageBackgroundColor #F8F9FF
+skinparam packageBorderColor #818CF8
+skinparam packageStyle rectangle
+skinparam padding 4
+skinparam nodesep 12
+skinparam ranksep 12
+skinparam shadowing false
+
+
+package "Usuarios y Roles" {
+
+  abstract class Usuario {
+    - id : Long
+    - nombre : String
+    - email : String
+    - passwordHash : String
+    - activo : Boolean
+    - creadoEn : LocalDateTime
+    + login(email, pass) : AuthToken
+    + logout() : void
+    + cambiarPassword(actual, nueva) : Boolean
+    + {abstract} getPermisos() : List<Permiso>
+  }
+
+  class GerenteOperaciones {
+    - presupuestoDiario : BigDecimal
+    + aprobarRutas(fecha) : void
+    + configurarPresupuesto(monto) : void
+    + getPermisos() : List<Permiso>
+  }
+
+  class Despachadora {
+    - turno : TipoTurno
+    + importarCSV(archivo) : ImportResult
+    + registrarPedidoManual(pedido) : Pedido
+    + getPermisos() : List<Permiso>
+  }
+
+  class Conductor {
+    - licencia : String
+    - categoriaLicencia : CategoriaLicencia
+    - calificacion : Double
+    - disponible : Boolean
+    + iniciarJornada() : void
+    + confirmarEntrega(pedidoId, firma) : void
+    + reportarIncidencia(desc) : Incidencia
+    + getPermisos() : List<Permiso>
+  }
+
+  class ClienteMinorista {
+    - ruc : String
+    - razonSocial : String
+    - notifPreferencia : CanalNotificacion
+    + consultarPedido(numero) : EstadoPedido
+    + getPermisos() : List<Permiso>
+  }
+
+  class Permiso {
+    - id : Long
+    - codigo : String
+    - modulo : String
+    - accion : String
+  }
+}
+
+' ══════════════════════════════════
+' PACKAGE: Pedidos
+' ══════════════════════════════════
+package "Pedidos" {
+
+  class Pedido {
+    - id : Long
+    - numeroPedido : String
+    - fechaCreacion : LocalDateTime
+    - fechaEntrega : LocalDate
+    - estado : EstadoPedido
+    - prioridad : NivelPrioridad
+    - montoTotal : BigDecimal
+    + calcularMontoTotal() : BigDecimal
+    + cambiarEstado(nuevo) : void
+    + esCancelable() : Boolean
+  }
+
+  class DetallePedido {
+    - id : Long
+    - cantidad : Integer
+    - precioUnit : BigDecimal
+    - subtotal : BigDecimal
+    + calcularSubtotal() : BigDecimal
+    + aplicarDescuento(pct) : void
+  }
+
+  class Producto {
+    - id : Long
+    - codigo : String
+    - nombre : String
+    - pesoKg : Double
+    - volumenM3 : Double
+    - precioBase : BigDecimal
+    - stock : Integer
+    + isDisponible() : Boolean
+    + actualizarStock(delta) : void
+  }
+
+  class DireccionEntrega {
+    - id : Long
+    - calle : String
+    - distrito : String
+    - ciudad : String
+    - latitud : Double
+    - longitud : Double
+    - validada : Boolean
+    + geocodificar() : Coordenadas
+    + validar() : Boolean
+  }
+
+  class ImportacionCSV {
+    - id : Long
+    - nombreArchivo : String
+    - fechaImport : LocalDateTime
+    - totalRegistros : Integer
+    - exitosos : Integer
+    - fallidos : Integer
+    - errores : String
+    + procesarArchivo(bytes) : ImportResult
+    + validarFormato(header) : Boolean
+  }
+}
+
+' ══════════════════════════════════
+' PACKAGE: Flota
+' ══════════════════════════════════
+package "Flota" {
+
+  abstract class Vehiculo {
+    - id : Long
+    - placa : String
+    - marca : String
+    - capacidadKg : Double
+    - capacidadM3 : Double
+    - estadoVehiculo : EstadoVehiculo
+    - kilometraje : Double
+    + {abstract} calcularCostoKm() : Double
+    + estaDisponible() : Boolean
+    + actualizarKilometraje(km) : void
+  }
+
+  class CamionRefrigerado {
+    - temperaturaMin : Double
+    - temperaturaMax : Double
+    + verificarTemperatura() : Boolean
+    + calcularCostoKm() : Double
+  }
+
+  class CamionConvencional {
+    - tipoCarga : TipoCarga
+    + calcularCostoKm() : Double
+  }
+
+  class TipoCombustible {
+    - id : Long
+    - nombre : String
+    - precioPorLitro : BigDecimal
+    + getPrecioActual() : BigDecimal
+  }
+
+  class RegistroMantenimiento {
+    - id : Long
+    - tipo : TipoMantenimiento
+    - fecha : LocalDate
+    - costo : BigDecimal
+    - proximoKm : Double
+    + isVencido(kmActual) : Boolean
+  }
+}
+
+
+package "Rutas" {
+
+  class Ruta {
+    - id : Long
+    - fecha : LocalDate
+    - estado : EstadoRuta
+    - distanciaTotal : Double
+    - duracionMin : Integer
+    - costoEstimado : BigDecimal
+    - aprobadaPor : Long
+    - aprobadaEn : LocalDateTime
+    + calcularCostoEstimado() : BigDecimal
+    + aprobar(gerenteId) : void
+    + recalcular() : void
+  }
+
+  class Parada {
+    - id : Long
+    - orden : Integer
+    - etaEstimada : LocalDateTime
+    - etaReal : LocalDateTime
+    - estado : EstadoParada
+    - latitud : Double
+    - longitud : Double
+    + llegada(hora) : void
+    + getRetrasoMinutos() : Integer
+  }
+
+  class ZonaGeografica {
+    - id : Long
+    - nombre : String
+    - poligonoWKT : String
+    + contieneCoord(lat, lng) : Boolean
+  }
+
+  class CostoRuta {
+    - id : Long
+    - combustibleSoles : BigDecimal
+    - peajesSoles : BigDecimal
+    - viaticosChofer : BigDecimal
+    - totalSoles : BigDecimal
+    + calcularTotal() : BigDecimal
+    + superaPresupuesto(limite) : Boolean
+  }
+
+  class RestriccionRuta {
+    - id : Long
+    - tipo : TipoRestriccion
+    - horaInicio : LocalTime
+    - horaFin : LocalTime
+    - diasSemana : String
+    + estaVigente() : Boolean
+    + aplicaA(vehiculo) : Boolean
+  }
+}
+
+
+package "GPS y Alertas" {
+
+  class RegistroPosicion {
+    - id : Long
+    - latitud : Double
+    - longitud : Double
+    - velocidad : Double
+    - timestamp : LocalDateTime
+    + calcularDistanciaA(destino) : Double
+    + isValida() : Boolean
+  }
+
+  class EventoGPS {
+    - id : Long
+    - tipo : TipoEventoGPS
+    - timestamp : LocalDateTime
+    - latitud : Double
+    - longitud : Double
+  }
+
+  class Alerta {
+    - id : Long
+    - tipo : TipoAlerta
+    - mensaje : String
+    - timestamp : LocalDateTime
+    - retrasoMin : Integer
+    - nuevoETA : LocalDateTime
+    - resuelta : Boolean
+    + resolver(accion) : void
+    + marcarLeida() : void
+  }
+
+  class Incidencia {
+    - id : Long
+    - tipo : TipoIncidencia
+    - descripcion : String
+    - timestamp : LocalDateTime
+    - resuelta : Boolean
+    + resolver(accion) : void
+    + escalar() : void
+  }
+}
+
+
+package "Notificaciones" {
+
+  abstract class Notificacion {
+    - id : Long
+    - tipo : TipoNotificacion
+    - estado : EstadoNotificacion
+    - mensaje : String
+    - enviadaEn : LocalDateTime
+    - intentos : Integer
+    + {abstract} enviar() : NotifResult
+    + reintentar() : Boolean
+    + marcarEntregada() : void
+  }
+
+  class NotificacionSMS {
+    - numeroDestino : String
+    - sid : String
+    + enviar() : NotifResult
+  }
+
+  class NotificacionEmail {
+    - emailDestino : String
+    - asunto : String
+    - templateId : String
+    - messageId : String
+    + enviar() : NotifResult
+    + renderTemplate() : String
+  }
+
+  class LogNotificacion {
+    - id : Long
+    - canal : String
+    - estado : String
+    - timestamp : LocalDateTime
+    - duplicadoEvitado : Boolean
+    + isDuplicado(pedidoId, tipo) : Boolean
+  }
+
+  class PreferenciaNotificacion {
+    - id : Long
+    - canal : CanalNotificacion
+    - activa : Boolean
+    - horaDesde : LocalTime
+    - horaHasta : LocalTime
+    + isActiva(hora) : Boolean
+  }
+}
+
+
+package "Analytics" {
+
+  class KPIDiario {
+    - id : Long
+    - fecha : LocalDate
+    - pctEntregasATiempo : Double
+    - totalPedidos : Integer
+    - entregados : Integer
+    - fallidos : Integer
+    - combustibleTotal : BigDecimal
+    + calcularPctExito() : Double
+  }
+
+  class DesempeñoConductor {
+    - id : Long
+    - fecha : LocalDate
+    - entregasCompletadas : Integer
+    - kmRecorridos : Double
+    - combustibleUsado : Double
+    - calificacion : Double
+    + calcularEficiencia() : Double
+  }
+
+  class Reporte {
+    - id : Long
+    - tipo : TipoReporte
+    - fechaDesde : LocalDate
+    - fechaHasta : LocalDate
+    - formato : FormatoReporte
+    - generadoEn : LocalDateTime
+    - urlArchivo : String
+    + generar() : byte[]
+    + exportar(formato) : byte[]
+  }
+}
+
+
+enum EstadoPedido <<enumeration>> {
+  PENDIENTE
+  ASIGNADO
+  EN_RUTA
+  ENTREGADO
+  FALLIDO
+  CANCELADO
+}
+
+enum EstadoRuta <<enumeration>> {
+  PROPUESTA
+  APROBADA
+  EN_CURSO
+  COMPLETADA
+  CANCELADA
+}
+
+enum EstadoParada <<enumeration>> {
+  PENDIENTE
+  EN_CAMINO
+  COMPLETADA
+  OMITIDA
+}
+
+enum CanalNotificacion <<enumeration>> {
+  SMS
+  EMAIL
+  BOTH
+  NONE
+}
+
+enum TipoAlerta <<enumeration>> {
+  RETRASO
+  SIN_SEÑAL
+  FUERA_DE_RUTA
+  PRESUPUESTO_EXCEDIDO
+}
+
+enum TipoEventoGPS <<enumeration>> {
+  INICIO_RUTA
+  PARADA_NO_PROGRAMADA
+  SEÑAL_PERDIDA
+  FIN_RUTA
+}
+
+enum NivelPrioridad <<enumeration>> {
+  BAJA
+  MEDIA
+  ALTA
+  CRITICA
+}
+
+enum EstadoVehiculo <<enumeration>> {
+  DISPONIBLE
+  EN_RUTA
+  MANTENIMIENTO
+  INACTIVO
+}
+
+enum FormatoReporte <<enumeration>> {
+  PDF
+  EXCEL
+  CSV
+}
+
+
+interface Auditable <<interface>> {
+  + getCreadoEn() : LocalDateTime
+  + getModificadoEn() : LocalDateTime
+}
+
+interface Geocodificable <<interface>> {
+  + getLatitud() : Double
+  + getLongitud() : Double
+}
+
+interface Exportable <<interface>> {
+  + exportar(formato) : byte[]
+}
+
+' ══════════════════════════════════
+' HERENCIA
+' ══════════════════════════════════
+Usuario <|-- GerenteOperaciones
+Usuario <|-- Despachadora
+Usuario <|-- Conductor
+Usuario <|-- ClienteMinorista
+
+Vehiculo <|-- CamionRefrigerado
+Vehiculo <|-- CamionConvencional
+
+Notificacion <|-- NotificacionSMS
+Notificacion <|-- NotificacionEmail
+
+
+Auditable <|.. Pedido
+Auditable <|.. Ruta
+Auditable <|.. Vehiculo
+Geocodificable <|.. DireccionEntrega
+Geocodificable <|.. RegistroPosicion
+Exportable <|.. Reporte
+Exportable <|.. KPIDiario
+
+
+Pedido *-- "1..*" DetallePedido : contiene
+Pedido *-- "1"    DireccionEntrega : tiene
+Ruta   *-- "2..*" Parada : define
+Ruta   *-- "1"    CostoRuta : tiene
+Notificacion *-- "1" LogNotificacion : registra
+ClienteMinorista *-- "1" PreferenciaNotificacion : configura
+
+
+Vehiculo o-- "0..*" RegistroMantenimiento : historial
+Reporte  o-- "1..*" KPIDiario : incluye
+KPIDiario o-- "1..*" DesempeñoConductor : consolida
+
+
+ClienteMinorista "1"    --  "0..*" Pedido : realiza
+DetallePedido    "1..*" --> "1"    Producto : referencia
+Despachadora     "1"    --> "0..*" Pedido : registra
+Despachadora     "1"    --> "0..*" ImportacionCSV : ejecuta
+ImportacionCSV   "1"    --> "0..*" Pedido : genera
+Vehiculo         "1"    --  "0..*" Ruta : ejecuta
+Conductor        "1"    --  "0..*" Ruta : conduce
+Parada           "1"    --> "1"    DireccionEntrega : visita
+Parada           "1"    --> "1..*" Pedido : entrega
+Ruta             "0..*" --> "1..*" ZonaGeografica : cruza
+ZonaGeografica   "1"    --  "0..*" RestriccionRuta : impone
+Vehiculo         "0..*" --> "1"    TipoCombustible : usa
+Vehiculo         "1"    --  "0..*" RegistroPosicion : emite
+Vehiculo         "1"    --  "0..*" EventoGPS : genera
+Ruta             "1"    --  "0..*" Alerta : origina
+Conductor        "1"    --  "0..*" Alerta : involucra
+Pedido           "1"    --  "0..*" Notificacion : dispara
+ClienteMinorista "1"    --  "0..*" Notificacion : recibe
+Conductor        "1"    --  "0..*" Incidencia : reporta
+Ruta             "1"    --  "0..*" Incidencia : contiene
+GerenteOperaciones "1"  --> "0..*" Ruta : aprueba
+GerenteOperaciones "1"  --> "0..*" Reporte : genera
+Conductor        "1"    --  "0..*" DesempeñoConductor : registra
+Usuario          "0..*" --  "1..*" Permiso : posee
+
+@enduml 
