@@ -12,11 +12,10 @@ assignees: ""
 ## 🎯 Causa Raíz que Resuelve
 **CR1 – Planificación manual de rutas:** La planificación diaria se realiza en pizarra y Excel sin ningún algoritmo de optimización ni criterios objetivos de asignación.
 
-## ✅ Criterios de Aceptación
-<!-- La tarea se considera completada cuando... -->
-- [ ] 
-- [ ] 
-- [ ] 
+### Criterios de Aceptación
+- [ ] El gráfico debe mostrar los productos con stock menor al 15% en color rojo.
+- [ ] El sistema debe calcular la predicción basándose en las ventas de los últimos 30 días.
+- [ ] Los datos deben actualizarse en tiempo real al abrir el Dashboard. 
 
 ## 📋 Tareas Técnicas
 <!-- Subtareas o pasos necesarios para completar este issue -->
